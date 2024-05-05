@@ -8,7 +8,7 @@ const handler = NextAuth({
             ClientSecret:'process.env.GOOGLE_CLIENT_SECRET',
         })
     ],
-    async sessionStorage({session}) {
+    async session({session}) {
     
     },
     async signIn({profile}) {
