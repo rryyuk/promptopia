@@ -1,13 +1,14 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { connectTODB } from "@utils/database";
+
+import { connectToDB } from '@utils/database';
 import User from '@models/user';
 
 const handler = NextAuth({
     providers:[
         GoogleProvider({
-            ClientId: process.env.GOOGLE_ID,
-            ClientSecret:process.env.GOOGLE_CLIENT_SECRET,
+            clientId: process.env.GOOGLE_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         })
     ],
     callbacks: {
@@ -15,21 +16,21 @@ const handler = NextAuth({
             const sessionUser = await User.findOne({
                 email: session.user.email
             })
-            session.user.id = sessionUser,_id.toString();
+            session.user.id = sessionUser._id.toString();
             return session;
         },
-        async signIn({profile}) {
+        async signIn({account, profile, user, credentials}) {
             try {
-                await connectTODB();
+                await connectToDB();
                 const userExist = await User.findOne({
-                    email:profile.email
+                    email: profile.email
                 });
                 if(!userExist) {
                     await User.create({
                         email: profile.email,
                         username: profile.name.replace(" ", "").toLowerCase(),
-                        image: profile.picture
-                    })
+                        image: profile.picture,
+                    });
                 }
                 return true;
             } catch (error) {
